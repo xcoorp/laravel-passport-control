@@ -43,7 +43,7 @@ class Token
         $this->scopes = $scopes;
         $this->clientId = $clientId;
         $this->userId = $userId;
-        $this->expiresAt = Carbon::parse($expiresAt);
+        $this->expiresAt = Carbon::createFromTimestamp($expiresAt);
     }
 
     /**
