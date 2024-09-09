@@ -2,8 +2,20 @@
 
 namespace XCoorp\PassportControl;
 
+use Illuminate\Database\Eloquent\Model;
+
 class PassportControl
 {
+    /**
+     * The User model class to use, when creating a new user
+     */
+    public static ?string $userModel = null;
+
+    /**
+     * Create user if not present
+     */
+    public static ?bool $withUserCreationIfNotPresent = null;
+
     /**
      * The storage location of the passport public key
      */
@@ -43,6 +55,35 @@ class PassportControl
      * The cache prefix to use for caching access tokens and other cacheable data.
      */
     public static ?string $cachePrefix = null;
+
+
+    /**
+     * Set the user model
+     */
+    public static function withUserModel(string $model): void {
+        static::$userModel = $model;
+    }
+
+    /**
+     * Get the user model
+     */
+    public static function userModel(): string {
+        return static::$userModel ?? config('passport_control.user_model');
+    }
+
+    /**
+     * Set the user model
+     */
+    public static function withUserCreationIfNotPresent(bool $enabled): void {
+        static::$withUserCreationIfNotPresent = $enabled;
+    }
+
+    /**
+     * Get the user model
+     */
+    public static function userCreationIfNotPresent(): bool {
+        return static::$withUserCreationIfNotPresent ?? config('passport_control.user_creation_if_not_present');
+    }
 
     /**
      * Set the cache prefix.

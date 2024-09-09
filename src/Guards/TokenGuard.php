@@ -18,6 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Throwable;
 use XCoorp\PassportControl\Exceptions\UnauthorizedException;
+use XCoorp\PassportControl\PassportControl;
 use XCoorp\PassportControl\PassportControlUserProvider;
 use XCoorp\PassportControl\Repositories\TokenRepository;
 
@@ -130,6 +131,14 @@ class TokenGuard implements Guard
         $user = $this->provider->retrieveById(
             $token->user() ?: null
         );
+
+        // If no user is found, but user creation is enabled, create the user.
+        if (!$user && PassportControl::userCreationIfNotPresent()) {
+            $userClass = PassportControl::userModel();
+            $user = $userClass::create([
+                'id' => $token->user()
+            ]);
+        }
 
         /** @noinspection PhpUndefinedMethodInspection */
         return $user?->withAccessToken($token);

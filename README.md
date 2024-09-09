@@ -22,6 +22,7 @@ same concepts and interfaces.
     - [Composer](#composer)
     - [Configuration](#configuration)
 - [Usage](#usage)
+    - [Advanced Usage](#advanced-usage) 
 - [Testing](#testing)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)
@@ -79,20 +80,21 @@ php artisan migrate
 This package comes with a configuration file that you can and should customize to your needs.
 The configuration file is located at `config/passport-control.php`.
 
-All configuration options can be also configured via environment variables instead of the configuration file.
+All configuration options (except the User Model) can be also configured via environment variables instead of the configuration file.
 
 The following Environment variables are available:
 
-| Environment Variable                    | Value                                                                                                                                              | Default                           |
-|-----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
-| PASSCONTROL_INTROSPECTION_ENDPOINT      | The Introspection Endpoint URL. Usually $YOUR_PASSPORT_SERVER/oauth/introspect                                                                     | http://localhost/oauth/introspect |
-| PASSCONTROL_ACCESS_TOKEN_ENDPOINT       | The Token Endpoint URL to receive a new access token. Usually $YOUR_PASSPORT_SERVER/oauth/token                                                    | http://localhost/oauth/token      |
-| PASSCONTROL_ACCESS_TOKEN_CLIENT_ID      | Client Id needed to get the access token for introspection. Check [Pre-requisites](#pre-requisites) for more information.                          |                                   |
-| PASSCONTROL_ACCESS_TOKEN_CLIENT_SECRET  | Client Secret needed to get the access token for introspection. Check [Pre-requisites](#pre-requisites) for more information.                      |                                   |
-| PASSCONTROL_PUBLIC_KEY_PATH             | Path where the public key file `oauth-public.key` is stored. NOTE: Specify the path without the filename.                                          | Laravel Storage Path (storage)    |
-| PASSCONTROL_INHERIT_SCOPES              | In Laravel Passport, you can configure that the scopes are inherited from the parent client, set to true if you have passport configured that way. | False                             |
-| PASSCONTROL_CACHE_STORE                 | Cache Storage used for storing the Client Credential Access Token                                                                                  | `CACHE_STORE`, file               |
-| PASSCONTROL_CACHE_PREFIX                | Cache Prefix used for storing the Client Credential Access Token                                                                                   | xcoorp_passcontrol_               |
+| Environment Variable                   | Value                                                                                                                                              | Default                           |
+|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------|
+| PASSCONTROL_CREATE_USER                | Whether this package should create a user in the local db if not existent.                                                                         | false                             |
+| PASSCONTROL_INTROSPECTION_ENDPOINT     | The Introspection Endpoint URL. Usually $YOUR_PASSPORT_SERVER/oauth/introspect                                                                     | http://localhost/oauth/introspect |
+| PASSCONTROL_ACCESS_TOKEN_ENDPOINT      | The Token Endpoint URL to receive a new access token. Usually $YOUR_PASSPORT_SERVER/oauth/token                                                    | http://localhost/oauth/token      |
+| PASSCONTROL_ACCESS_TOKEN_CLIENT_ID     | Client Id needed to get the access token for introspection. Check [Pre-requisites](#pre-requisites) for more information.                          |                                   |
+| PASSCONTROL_ACCESS_TOKEN_CLIENT_SECRET | Client Secret needed to get the access token for introspection. Check [Pre-requisites](#pre-requisites) for more information.                      |                                   |
+| PASSCONTROL_PUBLIC_KEY_PATH            | Path where the public key file `oauth-public.key` is stored. NOTE: Specify the path without the filename.                                          | Laravel Storage Path (storage)    |
+| PASSCONTROL_INHERIT_SCOPES             | In Laravel Passport, you can configure that the scopes are inherited from the parent client, set to true if you have passport configured that way. | False                             |
+| PASSCONTROL_CACHE_STORE                | Cache Storage used for storing the Client Credential Access Token                                                                                  | `CACHE_STORE`, file               |
+| PASSCONTROL_CACHE_PREFIX               | Cache Prefix used for storing the Client Credential Access Token                                                                                   | xcoorp_passcontrol_               |
 
 ## Usage
 
@@ -115,6 +117,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 ```
+
+### Advanced Usage
+
+In certain circumstances, you may want to automatically create a user in your local db, if there is none.
+If you want so you can enable this package to do this via the config. In that case, after success authentication,
+if no user is found in your local db, one is created. (`PASSCONTROL_CREATE_USER`).
+
+> [!TIP]
+> Only the user `id` field is filled, all other fields must be either nullable or have default values.
 
 ## Testing
 

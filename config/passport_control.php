@@ -3,6 +3,19 @@
 return [
     /*
     |--------------------------------------------------------------------------
+    | User Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This package, can create a user on your resource server, once the request
+    | is authenticated and in case there is not a user record yet. For this
+    | case you can set a custom User model here and decide weather you want to implement
+    | this feature or not.
+    */
+    'user_model' => \App\Models\User::class,
+    'user_creation_if_not_present' => env('PASSCONTROL_CREATE_USER', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Introspection URL of your Laravel Passport server
     |--------------------------------------------------------------------------
     |
