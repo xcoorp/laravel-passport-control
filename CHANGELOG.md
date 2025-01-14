@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/xcoorp/laravel-passport-control/compare/v1.1.0...v1.1.1) (2025-01-14)
+
+
+### Miscellaneous Chores
+
+* **deps:** lock file maintenance ([#59](https://github.com/xcoorp/laravel-passport-control/issues/59)) ([95b3caf](https://github.com/xcoorp/laravel-passport-control/commit/95b3caf5926e526ac46b67da89d6f55773cc302b))
+* **deps:** pin dependencies ([#55](https://github.com/xcoorp/laravel-passport-control/issues/55)) ([e8adcc5](https://github.com/xcoorp/laravel-passport-control/commit/e8adcc5469dd6b93b67d139c754f903efaeb98b9))
+
 ## [1.1.0](https://github.com/xcoorp/laravel-passport-control/compare/v1.0.0...v1.1.0) (2024-09-09)
 
 
