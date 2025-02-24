@@ -20,6 +20,13 @@ class UnauthorizedException extends HttpException
         return $exception;
     }
 
+    public static function invalidTokenType(): self
+    {
+        return new static(401, 'Access Token does not have the right type.', null, [
+            'WWW-Authenticate' => 'Bearer, error="invalid_token_type"',
+        ]);
+    }
+
     public static function notLoggedIn(): self
     {
         return new static(401, 'Access Token missing or not valid.', null, [

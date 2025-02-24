@@ -27,59 +27,23 @@ class TokenGuard implements Guard
     use GuardHelpers, Macroable;
 
     /**
-     * The resource server instance.
-     */
-    protected ResourceServer $server;
-
-    /**
-     * The user provider implementation.
-     *
-     * @var PassportControlUserProvider
-     */
-    protected $provider;
-
-    /**
-     * The token repository instance.
-     */
-    protected TokenRepository $tokens;
-
-    /**
-     * The encrypter implementation.
-     */
-    protected Encrypter $encrypter;
-
-    /**
-     * The request instance.
-     */
-    protected Request $request;
-
-    /**
      * The currently authenticated user.
      *
      * @var Authenticatable|null
      */
     protected $user = null;
 
-    /**
-     * Create a new token guard instance.
-     */
     public function __construct(
-        ResourceServer $server,
-        PassportControlUserProvider $provider,
-        TokenRepository $tokens,
-        Encrypter $encrypter,
-        Request $request
+        protected ResourceServer $server,
+        /** @var PassportControlUserProvider */
+        protected $provider,
+        protected TokenRepository $tokens,
+        protected Encrypter $encrypter,
+        protected Request $request
     ) {
-        $this->server = $server;
-        $this->provider = $provider;
-        $this->tokens = $tokens;
-        $this->encrypter = $encrypter;
-        $this->request = $request;
     }
 
     /**
-     * Get the user for the incoming request.
-     *
      * @throws Throwable
      */
     public function user(): ?Authenticatable
@@ -92,8 +56,6 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Validate a user's credentials.
-     *
      * @throws Throwable
      */
     public function validate(array $credentials = []): bool
@@ -121,13 +83,18 @@ class TokenGuard implements Guard
         // If the access token is valid, we introspect the token to get the user details
         $token = $this->tokens->introspect($psr->getAttribute('oauth_access_token_id'));
 
-        if (! $token || ! $token->isActive() || $token->expiresAt()->diffInSeconds() >= 0 || $psr->getAttribute('oauth_user_id') !== $token->user()) {
+        if (! $token
+            || ! $token->isActive()
+            || $token->expiresAt()->diffInSeconds() >= 0
+            || $token->notBefore() !== null && $token->notBefore()->diffInSeconds() >= 0
+            || $psr->getAttribute('oauth_user_id') !== $token->user()
+        ) {
             return null;
         }
 
         // If the access token is valid we will retrieve the user according to the user ID
         // associated with the token. We will use the provider implementation which may
-        // be used to retrieve users from Eloquent. Next, we'll be ready to continue.
+        // be used to retrieve users from Eloquent.
         $user = $this->provider->retrieveById(
             $token->user() ?: null
         );
@@ -135,9 +102,7 @@ class TokenGuard implements Guard
         // If no user is found, but user creation is enabled, create the user.
         if (!$user && PassportControl::userCreationIfNotPresent()) {
             $userClass = PassportControl::userModel();
-            $user = $userClass::create([
-                'id' => $token->user()
-            ]);
+            $user = $userClass::create(PassportControl::userModelMapper()($token));
         }
 
         /** @noinspection PhpUndefinedMethodInspection */
@@ -145,8 +110,6 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Authenticate and get the incoming PSR-7 request via the Bearer token.
-     *
      * @throws BindingResolutionException
      * @throws Throwable
      */
@@ -174,11 +137,6 @@ class TokenGuard implements Guard
         return null;
     }
 
-    /**
-     * Set the current request instance.
-     *
-     * @return $this
-     */
     public function setRequest(Request $request): static
     {
         $this->request = $request;

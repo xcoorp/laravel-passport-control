@@ -2,7 +2,7 @@
 
 namespace XCoorp\PassportControl;
 
-use Illuminate\Database\Eloquent\Model;
+use Closure;
 
 class PassportControl
 {
@@ -10,6 +10,11 @@ class PassportControl
      * The User model class to use, when creating a new user
      */
     public static ?string $userModel = null;
+
+    /**
+     * The function that maps a Token to the user model attributes.
+     */
+    public static ?Closure $userModelMapper = null;
 
     /**
      * Create user if not present
@@ -56,126 +61,100 @@ class PassportControl
      */
     public static ?string $cachePrefix = null;
 
-
     /**
-     * Set the user model
+     * How long to cache introspection results in seconds, null means never
      */
+    public static ?int $cacheIntrospectionResults = null;
+
     public static function withUserModel(string $model): void {
         static::$userModel = $model;
     }
 
-    /**
-     * Get the user model
-     */
     public static function userModel(): string {
         return static::$userModel ?? config('passport_control.user_model');
     }
 
-    /**
-     * Set the user model
-     */
+    public static function withUserModelMapper(Closure $mappingFn): void {
+        static::$userModelMapper = $mappingFn;
+    }
+
+    public static function userModelMapper(): Closure {
+        return static::$userModelMapper ?? config('passport_control.user_model_mapping');
+    }
+
     public static function withUserCreationIfNotPresent(bool $enabled): void {
         static::$withUserCreationIfNotPresent = $enabled;
     }
 
-    /**
-     * Get the user model
-     */
     public static function userCreationIfNotPresent(): bool {
         return static::$withUserCreationIfNotPresent ?? config('passport_control.user_creation_if_not_present');
     }
 
-    /**
-     * Set the cache prefix.
-     */
     public static function withCachePrefix(string $prefix): void
     {
         static::$cachePrefix = $prefix;
     }
 
-    /**
-     * Get the cache prefix.
-     */
     public static function cachePrefix(): string
     {
         return static::$cachePrefix ?? config('passport_control.cache.prefix');
     }
 
-    /**
-     * Set the cache store.
-     */
     public static function withCacheStore(string $store): void
     {
         static::$cacheStore = $store;
     }
 
-    /**
-     * Get the cache store.
-     */
     public static function cacheStore(): string
     {
         return static::$cacheStore ?? config('passport_control.cache.store');
     }
 
-    /**
-     * Set the access token endpoint.
-     */
+    public static function withCacheIntrospectionResult(?int $timeInSeconds): void
+    {
+        static::$cacheIntrospectionResults = $timeInSeconds;
+    }
+
+    public static function cacheIntrospectionResult(): ?int
+    {
+        return static::$cacheIntrospectionResults ?? config('passport_control.cache.cache_introspection_result');
+    }
+
     public static function withAccessTokenEndpoint(string $endpoint): void
     {
         static::$accessTokenEndpoint = $endpoint;
     }
 
-    /**
-     * Get the access token endpoint.
-     */
     public static function accessTokenEndpoint(): string
     {
         return static::$accessTokenEndpoint ?? config('passport_control.access_token_endpoint');
     }
 
-    /**
-     * Set the client ID
-     */
     public static function withClientID(string $clientId): void
     {
         static::$clientId = $clientId;
     }
 
-    /**
-     * Get the client ID
-     */
     public static function clientID(): string
     {
         return static::$clientId ?? config('passport_control.access_token_client_id');
     }
 
-    /**
-     * Set the client secret
-     */
     public static function withClientSecret(string $clientSecret): void
     {
         static::$clientSecret = $clientSecret;
     }
 
-    /**
-     * Get the client secret
-     */
     public static function clientSecret(): string
     {
         return static::$clientSecret ?? config('passport_control.access_token_client_secret');
     }
 
-    /**
-     * Set the storage location of the public key.
-     */
     public static function loadKeyFrom(string $path): void
     {
         static::$publicKeyPath = $path;
     }
 
-    /**
-     * The location of the encryption keys.
-     */
     public static function keyPath(string $file): string
     {
         $file = ltrim($file, '/\\');
@@ -185,33 +164,21 @@ class PassportControl
             : config('passport_control.public_key_path').DIRECTORY_SEPARATOR.$file;
     }
 
-    /**
-     * Set the introspect endpoint.
-     */
     public static function useIntrospectEndpoint(string $endpoint): void
     {
         static::$introspectEndpoint = $endpoint;
     }
 
-    /**
-     * Get the introspect endpoint.
-     */
     public static function introspectEndpoint(): string
     {
         return static::$introspectEndpoint ?? config('passport_control.introspection_endpoint');
     }
 
-    /**
-     * Set if the scope should inherit its parent scope.
-     */
     public static function inheritScopes(bool $withInheritedScopes = true): void
     {
         static::$withInheritedScopes = $withInheritedScopes;
     }
 
-    /**
-     * Get if the scope should inherit its parent scope.
-     */
     public static function withInheritedScopes(): bool
     {
         return static::$withInheritedScopes ?? config('passport_control.inherit_scopes');

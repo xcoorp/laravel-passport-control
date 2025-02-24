@@ -7,25 +7,10 @@ use Illuminate\Contracts\Auth\UserProvider;
 
 class PassportControlUserProvider implements UserProvider
 {
-    /**
-     * The user provider instance.
-     */
-    protected UserProvider $provider;
-
-    /**
-     * The user provider name.
-     */
-    protected string $providerName;
-
-    /**
-     * Create a new passport control user provider.
-     *
-     * @return void
-     */
-    public function __construct(UserProvider $provider, string $providerName)
-    {
-        $this->provider = $provider;
-        $this->providerName = $providerName;
+    public function __construct(
+        protected UserProvider $provider,
+        protected string $providerName
+    ) {
     }
 
     /**
@@ -76,9 +61,6 @@ class PassportControlUserProvider implements UserProvider
         $this->provider->rehashPasswordIfRequired($user, $credentials, $force);
     }
 
-    /**
-     * Get the name of the user provider.
-     */
     public function getProviderName(): string
     {
         return $this->providerName;

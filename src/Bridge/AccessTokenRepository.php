@@ -10,25 +10,10 @@ use XCoorp\PassportControl\Repositories\TokenRepository;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
-    /**
-     * The token repository instance.
-     */
-    protected TokenRepository $tokenRepository;
-
-    /**
-     * The event dispatcher instance.
-     */
-    protected Dispatcher $events;
-
-    /**
-     * Create a new repository instance.
-     *
-     * @return void
-     */
-    public function __construct(TokenRepository $tokenRepository, Dispatcher $events)
-    {
-        $this->events = $events;
-        $this->tokenRepository = $tokenRepository;
+    public function __construct(
+        protected TokenRepository $tokenRepository,
+        protected Dispatcher $events
+    ) {
     }
 
     /**
@@ -49,9 +34,6 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function revokeAccessToken(string $tokenId): void {}
 
-    /**
-     * Check if the access token has been revoked.
-     */
     public function isAccessTokenRevoked(string $tokenId): bool
     {
         return $this->tokenRepository->isAccessTokenRevoked($tokenId);

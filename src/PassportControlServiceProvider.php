@@ -46,9 +46,6 @@ class PassportControlServiceProvider extends ServiceProvider
         $this->registerModelBindings();
     }
 
-    /**
-     * Register the JWT Parser.
-     */
     protected function registerJWTParser(): void
     {
         $this->app->singleton(ParserContract::class, function () {
@@ -66,17 +63,12 @@ class PassportControlServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Create a CryptKey instance.
-     */
     protected function makeCryptKey(): CryptKey
     {
         return new CryptKey('file://'.PassportControl::keyPath('oauth-public.key'), null);
     }
 
     /**
-     * Register the token guard.
-     *
      * @throws BindingResolutionException
      */
     protected function registerGuard(): void
@@ -92,8 +84,6 @@ class PassportControlServiceProvider extends ServiceProvider
     }
 
     /**
-     * Make an instance of the token guard.
-     *
      * @throws BindingResolutionException
      */
     protected function makeGuard(array $config): TokenGuard
@@ -108,8 +98,6 @@ class PassportControlServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the package's publishable resources.
-     *
      * @throws BindingResolutionException
      */
     protected function registerPublishing(): void
@@ -128,8 +116,6 @@ class PassportControlServiceProvider extends ServiceProvider
     }
 
     /**
-     * Returns existing migration file if found, else uses the current timestamp.
-     *
      * @throws BindingResolutionException
      */
     protected function getMigrationFileName(string $migrationFileName): string

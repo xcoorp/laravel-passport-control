@@ -2,9 +2,11 @@
 
 namespace XCoorp\PassportControl\Repositories;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Throwable;
+use XCoorp\PassportControl\Enums\CredentialType;
 use XCoorp\PassportControl\PassportControl;
 use XCoorp\PassportControl\Token;
 
@@ -15,6 +17,16 @@ class TokenRepository
      */
     public function introspect(string $token_id): ?Token
     {
+        if (PassportControl::cacheIntrospectionResult() !== null) {
+            try {
+                $result = Cache::store(PassportControl::cacheStore())->get(PassportControl::cachePrefix().'tk_'.$token_id);
+                if ($result) {
+                    return $result;
+                }
+            } catch (Throwable) {
+            }
+        }
+
         $at = $this->getAccessToken();
         if (! $at) {
             return null;
@@ -39,13 +51,35 @@ class TokenRepository
                 return null;
             }
 
-            return new Token(
+            $type = $json['credential_type'] ?? 'unknown';
+            if (!in_array($type, array_column(CredentialType::cases(), "value"))) {
+                $type = 'unknown';
+            }
+
+            $token = new Token(
                 $json['active'] ?? false,
                 isset($json['scope']) ? explode(' ', $json['scope']) : [],
                 $json['client_id'],
-                $json['username'],
-                $json['exp']
+                $json['sub'],
+                CredentialType::from($type),
+                Carbon::createFromTimestamp($json['exp']),
+                $json['username'] ?? null,
+                isset($json['iat']) ? Carbon::createFromTimestamp($json['iat']) : null,
+                isset($json['nbf']) ? Carbon::createFromTimestamp($json['nbf']) : null,
             );
+
+            if (PassportControl::cacheIntrospectionResult() !== null && ($json['active'] ?? false)) {
+                try {
+                    Cache::store(PassportControl::cacheStore())->put(
+                        PassportControl::cachePrefix().'tk_'.$token_id,
+                        $token,
+                        min($json['exp'] - time(), PassportControl::cacheIntrospectionResult())
+                    );
+                } catch (Throwable) {
+                }
+            }
+
+            return $token;
         } catch (Throwable) {
         }
 
@@ -68,9 +102,6 @@ class TokenRepository
      * The introspection API is not a publicly accessible endpoint.
      * In order to access it, we need to authenticate with the introspection API.
      * This method returns the access token that we use to authenticate with the introspection API.
-     *
-     * It will first try to fetch one from cache, if it does not exist, it will request a new one and store
-     * it in the cache.
      */
     public function getAccessToken(): ?string
     {

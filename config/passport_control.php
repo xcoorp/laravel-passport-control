@@ -13,6 +13,12 @@ return [
     */
     'user_model' => \App\Models\User::class,
     'user_creation_if_not_present' => env('PASSCONTROL_CREATE_USER', false),
+    'user_model_mapping' => function (\XCoorp\PassportControl\Token $token) {
+        return [
+            'id' => $token->user(),
+            'email' => $token->username(),
+        ];
+    },
 
     /*
     |--------------------------------------------------------------------------
@@ -75,5 +81,15 @@ return [
         | Cache prefix to use for caching access tokens and other cacheable data.
         */
         'prefix' => env('PASSCONTROL_CACHE_PREFIX', 'xcoorp_passcontrol_'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cache Introspection Result
+        |--------------------------------------------------------------------------
+        | Cache the result from the introspection api for a token for a certain amount of time (in seconds).
+        | This is useful to reduce the number of requests to the introspection endpoint.
+        | Set this value to null to disable caching.
+        */
+        'cache_introspection_result' => null
     ],
 ];

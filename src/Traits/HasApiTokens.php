@@ -11,9 +11,6 @@ trait HasApiTokens
      */
     protected ?Token $accessToken = null;
 
-    /**
-     * Get the current access token being used by the user.
-     */
     public function token(): ?Token
     {
         return $this->accessToken;

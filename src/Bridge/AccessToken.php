@@ -12,11 +12,6 @@ class AccessToken implements AccessTokenEntityInterface
 {
     use AccessTokenTrait, EntityTrait, TokenEntityTrait;
 
-    /**
-     * Create a new token instance.
-     *
-     * @return void
-     */
     public function __construct(string $userIdentifier, array $scopes, ClientEntityInterface $client)
     {
         $this->setUserIdentifier($userIdentifier);
