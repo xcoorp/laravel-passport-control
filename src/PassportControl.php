@@ -2,25 +2,8 @@
 
 namespace XCoorp\PassportControl;
 
-use Closure;
-
 class PassportControl
 {
-    /**
-     * The User model class to use, when creating a new user
-     */
-    public static ?string $userModel = null;
-
-    /**
-     * The function that maps a Token to the user model attributes.
-     */
-    public static ?Closure $userModelMapper = null;
-
-    /**
-     * Create user if not present
-     */
-    public static ?bool $withUserCreationIfNotPresent = null;
-
     /**
      * The storage location of the passport public key
      */
@@ -66,29 +49,6 @@ class PassportControl
      */
     public static ?int $cacheIntrospectionResults = null;
 
-    public static function withUserModel(string $model): void {
-        static::$userModel = $model;
-    }
-
-    public static function userModel(): string {
-        return static::$userModel ?? config('passport_control.user_model');
-    }
-
-    public static function withUserModelMapper(Closure $mappingFn): void {
-        static::$userModelMapper = $mappingFn;
-    }
-
-    public static function userModelMapper(): Closure {
-        return static::$userModelMapper ?? config('passport_control.user_model_mapping');
-    }
-
-    public static function withUserCreationIfNotPresent(bool $enabled): void {
-        static::$withUserCreationIfNotPresent = $enabled;
-    }
-
-    public static function userCreationIfNotPresent(): bool {
-        return static::$withUserCreationIfNotPresent ?? config('passport_control.user_creation_if_not_present');
-    }
 
     public static function withCachePrefix(string $prefix): void
     {

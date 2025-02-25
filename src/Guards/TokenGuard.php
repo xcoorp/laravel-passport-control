@@ -6,6 +6,7 @@ use Illuminate\Auth\GuardHelpers;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Encryption\Encrypter;
@@ -17,10 +18,9 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Throwable;
+use XCoorp\PassportControl\Contracts\TokenRepository;
+use XCoorp\PassportControl\Contracts\UserResolver;
 use XCoorp\PassportControl\Exceptions\UnauthorizedException;
-use XCoorp\PassportControl\PassportControl;
-use XCoorp\PassportControl\PassportControlUserProvider;
-use XCoorp\PassportControl\Repositories\TokenRepository;
 
 class TokenGuard implements Guard
 {
@@ -35,8 +35,9 @@ class TokenGuard implements Guard
 
     public function __construct(
         protected ResourceServer $server,
-        /** @var PassportControlUserProvider */
+        /** @var UserProvider */
         protected $provider,
+        protected UserResolver $userResolver,
         protected TokenRepository $tokens,
         protected Encrypter $encrypter,
         protected Request $request
@@ -63,6 +64,7 @@ class TokenGuard implements Guard
         return ! is_null((new static(
             $this->server,
             $this->provider,
+            $this->userResolver,
             $this->tokens,
             $this->encrypter,
             $credentials['request'],
@@ -70,8 +72,6 @@ class TokenGuard implements Guard
     }
 
     /**
-     * Authenticate the incoming request via the Bearer token.
-     *
      * @throws Throwable
      */
     protected function authenticateViaBearerToken(Request $request): ?Authenticatable
@@ -80,30 +80,18 @@ class TokenGuard implements Guard
             return null;
         }
 
-        // If the access token is valid, we introspect the token to get the user details
         $token = $this->tokens->introspect($psr->getAttribute('oauth_access_token_id'));
 
         if (! $token
             || ! $token->isActive()
             || $token->expiresAt()->diffInSeconds() >= 0
-            || $token->notBefore() !== null && $token->notBefore()->diffInSeconds() >= 0
+            || $token->notBefore() !== null && $token->notBefore()->diffInSeconds() < 0
             || $psr->getAttribute('oauth_user_id') !== $token->user()
         ) {
             return null;
         }
 
-        // If the access token is valid we will retrieve the user according to the user ID
-        // associated with the token. We will use the provider implementation which may
-        // be used to retrieve users from Eloquent.
-        $user = $this->provider->retrieveById(
-            $token->user() ?: null
-        );
-
-        // If no user is found, but user creation is enabled, create the user.
-        if (!$user && PassportControl::userCreationIfNotPresent()) {
-            $userClass = PassportControl::userModel();
-            $user = $userClass::create(PassportControl::userModelMapper()($token));
-        }
+        $user = $this->userResolver->resolveUserByToken($token, $this->provider);
 
         /** @noinspection PhpUndefinedMethodInspection */
         return $user?->withAccessToken($token);
@@ -127,8 +115,8 @@ class TokenGuard implements Guard
 
         try {
             return $this->server->validateAuthenticatedRequest($psr);
-        } catch (OAuthServerException $e) {
-            $request->headers->set('Authorization', '', true);
+        } catch (OAuthServerException) {
+            $request->headers->set('Authorization', '');
 
             Container::getInstance()->make(ExceptionHandler::class)
                 ->report(UnauthorizedException::notLoggedIn());

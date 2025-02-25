@@ -13,15 +13,17 @@ use Lcobucci\JWT\Token\Parser;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\ResourceServer;
 use XCoorp\PassportControl\Bridge\AccessTokenRepository;
-use XCoorp\PassportControl\Contracts\UserContract;
+use XCoorp\PassportControl\Contracts\TokenFactory as TokenFactoryContract;
+use XCoorp\PassportControl\Contracts\Token as TokenContract;
+use XCoorp\PassportControl\Contracts\TokenRepository as TokenRepositoryContract;
+use XCoorp\PassportControl\Contracts\UserResolver as UserResolverContract;
+use XCoorp\PassportControl\Factories\TokenFactory;
 use XCoorp\PassportControl\Guards\TokenGuard;
-use XCoorp\PassportControl\Repositories\TokenRepository;
+use XCoorp\PassportControl\Resolver\UserResolver;
 
 class PassportControlServiceProvider extends ServiceProvider
 {
     /**
-     * Register any package services.
-     *
      * @throws BindingResolutionException
      */
     public function register(): void
@@ -30,45 +32,45 @@ class PassportControlServiceProvider extends ServiceProvider
             __DIR__.'/../config/passport_control.php', 'passport_control'
         );
 
-        $this->registerJWTParser();
-        $this->registerResourceServer();
-        $this->registerGuard();
-    }
+        $this->app->bind(UserResolverContract::class, UserResolver::class);
 
-    /**
-     * Bootstrap any package services.
-     *
-     * @throws BindingResolutionException
-     */
-    public function boot(): void
-    {
-        $this->registerPublishing();
-        $this->registerModelBindings();
-    }
+        $this->app->bind(TokenContract::class, Token::class);
+        $this->app->bind(TokenFactoryContract::class, TokenFactory::class);
+        $this->app->bind(TokenRepositoryContract::class, function ($app) {
+            return new Repositories\TokenRepository(
+                $app->make(TokenFactoryContract::class)
+            );
+        });
 
-    protected function registerJWTParser(): void
-    {
         $this->app->singleton(ParserContract::class, function () {
             return new Parser(new JoseEncoder);
         });
-    }
 
-    protected function registerResourceServer(): void
-    {
         $this->app->singleton(ResourceServer::class, function ($container) {
             return new ResourceServer(
                 $container->make(AccessTokenRepository::class),
                 $this->makeCryptKey()
             );
         });
+
+        $this->registerGuard();
     }
 
+
+    public function boot(): void
+    {
+        $this->registerPublishing();
+    }
+    /**
+     * Create a CryptKey instance for the OAuth public key.
+     */
     protected function makeCryptKey(): CryptKey
     {
         return new CryptKey('file://'.PassportControl::keyPath('oauth-public.key'), null);
     }
 
     /**
+     * Register the token guard.
      * @throws BindingResolutionException
      */
     protected function registerGuard(): void
@@ -76,8 +78,9 @@ class PassportControlServiceProvider extends ServiceProvider
         Auth::resolved(function ($auth) {
             $auth->extend('passport_control', function ($app, $name, array $config) {
                 return tap($this->makeGuard($config), function ($guard) {
-                    /** @noinspection PhpUndefinedFunctionInspection */
-                    app()->refresh('request', $guard, 'setRequest');
+                    $app = $this->app;
+                    /** @noinspection PhpUndefinedMethodInspection */
+                    $app->refresh('request', $guard, 'setRequest');
                 });
             });
         });
@@ -91,14 +94,15 @@ class PassportControlServiceProvider extends ServiceProvider
         return new TokenGuard(
             $this->app->make(ResourceServer::class),
             new PassportControlUserProvider(Auth::createUserProvider($config['provider']), $config['provider']),
-            $this->app->make(TokenRepository::class),
+            $this->app->make(UserResolverContract::class),
+            $this->app->make(TokenRepositoryContract::class),
             $this->app->make('encrypter'),
             $this->app->make('request')
         );
     }
 
     /**
-     * @throws BindingResolutionException
+     * Register the package's publishable resources.
      */
     protected function registerPublishing(): void
     {
@@ -116,22 +120,17 @@ class PassportControlServiceProvider extends ServiceProvider
     }
 
     /**
-     * @throws BindingResolutionException
+     * Get the migration file name with timestamp.
      */
     protected function getMigrationFileName(string $migrationFileName): string
     {
         $timestamp = date('Y_m_d_His');
-
         $filesystem = $this->app->make(Filesystem::class);
+        $migrationPath = $this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR;
 
-        return Collection::make([$this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR])
+        return Collection::make([$migrationPath])
             ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
-            ->push($this->app->databasePath()."/migrations/{$timestamp}_{$migrationFileName}")
+            ->push($migrationPath."{$timestamp}_{$migrationFileName}")
             ->first();
-    }
-
-    protected function registerModelBindings(): void
-    {
-        $this->app->bind(UserContract::class, fn ($app) => $app->make($app->config['passport_control.user_model']));
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-namespace XCoorp\PassportControl\Traits;
+namespace XCoorp\PassportControl\Models\Traits;
 
-use XCoorp\PassportControl\Token;
+use XCoorp\PassportControl\Contracts\Token;
 
 trait HasApiTokens
 {
@@ -11,7 +11,7 @@ trait HasApiTokens
      */
     protected ?Token $accessToken = null;
 
-    public function token(): ?Token
+    public function token(): Token
     {
         return $this->accessToken;
     }

@@ -1,12 +1,12 @@
 <?php
 
-namespace XCoorp\PassportControl\Middleware;
+namespace XCoorp\PassportControl\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use XCoorp\PassportControl\Exceptions\UnauthorizedException;
 
-class ScopesMiddleware
+class CheckScopes
 {
     public function handle($request, Closure $next, $scope, $guard = null)
     {

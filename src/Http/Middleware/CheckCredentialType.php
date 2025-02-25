@@ -1,13 +1,13 @@
 <?php
 
-namespace XCoorp\PassportControl\Middleware;
+namespace XCoorp\PassportControl\Http\Middleware;
 
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use XCoorp\PassportControl\Enums\CredentialType;
 use XCoorp\PassportControl\Exceptions\UnauthorizedException;
 
-class CredentialTypeMiddleware
+class CheckCredentialType
 {
     public function handle($request, Closure $next, $credential_type, $guard = null)
     {

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
-use XCoorp\PassportControl\Repositories\TokenRepository;
+use XCoorp\PassportControl\Contracts\TokenRepository;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
@@ -36,6 +36,6 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
 
     public function isAccessTokenRevoked(string $tokenId): bool
     {
-        return $this->tokenRepository->isAccessTokenRevoked($tokenId);
+        return false;
     }
 }

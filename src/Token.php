@@ -2,11 +2,12 @@
 
 namespace XCoorp\PassportControl;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
+use XCoorp\PassportControl\Contracts\Token as TokenContract;
 use XCoorp\PassportControl\Enums\CredentialType;
 use XCoorp\PassportControl\Traits\ResolvesInheritedScopes;
 
-class Token
+class Token implements TokenContract
 {
     use ResolvesInheritedScopes;
 
@@ -24,7 +25,7 @@ class Token
     }
 
     /**
-     * Determine if the token has a given scope.
+     * {@inheritDoc}
      */
     public function can(string $scope): bool
     {
@@ -45,14 +46,6 @@ class Token
         return false;
     }
 
-    /**
-     * Determine if the token is missing a given scope.
-     */
-    public function cant(string $scope): bool
-    {
-        return ! $this->can($scope);
-    }
-
     public function isActive(): bool
     {
         return $this->active;
@@ -71,6 +64,11 @@ class Token
     public function credentialType(): CredentialType
     {
         return $this->credentialType;
+    }
+
+    public function scopes(): array
+    {
+        return $this->scopes;
     }
 
     public function expiresAt(): Carbon

@@ -3,25 +3,6 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | User Configuration
-    |--------------------------------------------------------------------------
-    |
-    | This package, can create a user on your resource server, once the request
-    | is authenticated and in case there is not a user record yet. For this
-    | case you can set a custom User model here and decide weather you want to implement
-    | this feature or not.
-    */
-    'user_model' => \App\Models\User::class,
-    'user_creation_if_not_present' => env('PASSCONTROL_CREATE_USER', false),
-    'user_model_mapping' => function (\XCoorp\PassportControl\Token $token) {
-        return [
-            'id' => $token->user(),
-            'email' => $token->username(),
-        ];
-    },
-
-    /*
-    |--------------------------------------------------------------------------
     | Introspection URL of your Laravel Passport server
     |--------------------------------------------------------------------------
     |
@@ -90,6 +71,6 @@ return [
         | This is useful to reduce the number of requests to the introspection endpoint.
         | Set this value to null to disable caching.
         */
-        'cache_introspection_result' => null
+        'cache_introspection_result' =>  env('PASSCONTROL_CACHE_INTROSPECTION_RESULT'),
     ],
 ];

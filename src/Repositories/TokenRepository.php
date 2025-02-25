@@ -2,18 +2,23 @@
 
 namespace XCoorp\PassportControl\Repositories;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Throwable;
-use XCoorp\PassportControl\Enums\CredentialType;
+use XCoorp\PassportControl\Contracts\TokenFactory;
+use XCoorp\PassportControl\Contracts\Token;
+use XCoorp\PassportControl\Contracts\TokenRepository as TokenRepositoryContract;
 use XCoorp\PassportControl\PassportControl;
-use XCoorp\PassportControl\Token;
 
-class TokenRepository
+class TokenRepository implements TokenRepositoryContract
 {
+    public function __construct(
+        protected TokenFactory $tokenFactory
+    ) {
+    }
+
     /**
-     * Get a token by the given ID.
+     * {@inheritDoc}
      */
     public function introspect(string $token_id): ?Token
     {
@@ -51,22 +56,7 @@ class TokenRepository
                 return null;
             }
 
-            $type = $json['credential_type'] ?? 'unknown';
-            if (!in_array($type, array_column(CredentialType::cases(), "value"))) {
-                $type = 'unknown';
-            }
-
-            $token = new Token(
-                $json['active'] ?? false,
-                isset($json['scope']) ? explode(' ', $json['scope']) : [],
-                $json['client_id'],
-                $json['sub'],
-                CredentialType::from($type),
-                Carbon::createFromTimestamp($json['exp']),
-                $json['username'] ?? null,
-                isset($json['iat']) ? Carbon::createFromTimestamp($json['iat']) : null,
-                isset($json['nbf']) ? Carbon::createFromTimestamp($json['nbf']) : null,
-            );
+            $token = $this->tokenFactory->createToken($json);
 
             if (PassportControl::cacheIntrospectionResult() !== null && ($json['active'] ?? false)) {
                 try {
@@ -86,17 +76,6 @@ class TokenRepository
         return null;
     }
 
-    /**
-     * This is used by the League OAuth2 server to validate the access token.
-     * Since we call the introspect method to get the token details, we don't need to implement this method.
-     * If an access token is expired, we know from the introspect endpoint.
-     *
-     * @return false
-     */
-    public function isAccessTokenRevoked(string $token_id): bool
-    {
-        return false;
-    }
 
     /**
      * The introspection API is not a publicly accessible endpoint.
