@@ -3,6 +3,7 @@
 namespace XCoorp\PassportControl\Repositories;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Throwable;
 use XCoorp\PassportControl\Contracts\TokenFactory;
@@ -88,7 +89,7 @@ class TokenRepository implements TokenRepositoryContract
         try {
             $accessToken = Cache::store(PassportControl::cacheStore())->get(PassportControl::cachePrefix().'introspection_at');
             if ($accessToken) {
-                return $accessToken;
+                return Crypt::decryptString($accessToken);
             }
         } catch (Throwable) {
         }
@@ -122,7 +123,7 @@ class TokenRepository implements TokenRepositoryContract
         try {
             Cache::store(PassportControl::cacheStore())->put(
                 PassportControl::cachePrefix().'introspection_at',
-                $json['access_token'],
+                Crypt::encryptString($json['access_token']),
                 $json['expires_in'] - 60
             );
         } catch (Throwable) {

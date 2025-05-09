@@ -3,7 +3,6 @@
 namespace XCoorp\PassportControl\Contracts;
 
 use Illuminate\Support\Carbon;
-use XCoorp\PassportControl\Enums\CredentialType;
 
 interface Token
 {
@@ -21,8 +20,6 @@ interface Token
     public function username(): ?string;
 
     public function scopes(): array;
-
-    public function credentialType(): CredentialType;
 
     public function expiresAt(): Carbon;
 

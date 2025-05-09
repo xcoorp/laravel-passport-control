@@ -57,6 +57,9 @@ class PassportControlServiceProvider extends ServiceProvider
     }
 
 
+    /**
+     * @throws BindingResolutionException
+     */
     public function boot(): void
     {
         $this->registerPublishing();
@@ -103,6 +106,7 @@ class PassportControlServiceProvider extends ServiceProvider
 
     /**
      * Register the package's publishable resources.
+     * @throws BindingResolutionException
      */
     protected function registerPublishing(): void
     {
@@ -121,6 +125,7 @@ class PassportControlServiceProvider extends ServiceProvider
 
     /**
      * Get the migration file name with timestamp.
+     * @throws BindingResolutionException
      */
     protected function getMigrationFileName(string $migrationFileName): string
     {
@@ -130,7 +135,7 @@ class PassportControlServiceProvider extends ServiceProvider
 
         return Collection::make([$migrationPath])
             ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
-            ->push($migrationPath."{$timestamp}_{$migrationFileName}")
+            ->push($migrationPath."{$timestamp}_$migrationFileName")
             ->first();
     }
 }

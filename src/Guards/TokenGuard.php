@@ -14,10 +14,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\ResourceServer;
-use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Throwable;
+use XCoorp\PassportControl\Auth\Client;
+use XCoorp\PassportControl\Contracts\Token;
 use XCoorp\PassportControl\Contracts\TokenRepository;
 use XCoorp\PassportControl\Contracts\UserResolver;
 use XCoorp\PassportControl\Exceptions\UnauthorizedException;
@@ -27,7 +28,7 @@ class TokenGuard implements Guard
     use GuardHelpers, Macroable;
 
     /**
-     * The currently authenticated user.
+     * The currently authenticated user or client.
      *
      * @var Authenticatable|null
      */
@@ -35,7 +36,7 @@ class TokenGuard implements Guard
 
     public function __construct(
         protected ResourceServer $server,
-        /** @var UserProvider */
+        /** @var UserProvider|null */
         protected $provider,
         protected UserResolver $userResolver,
         protected TokenRepository $tokens,
@@ -74,26 +75,42 @@ class TokenGuard implements Guard
     /**
      * @throws Throwable
      */
-    protected function authenticateViaBearerToken(Request $request): ?Authenticatable
-    {
+    protected function authenticateViaBearerToken(Request $request): ?Authenticatable {
         if (! $psr = $this->getPsrRequestViaBearerToken($request)) {
             return null;
         }
 
         $token = $this->tokens->introspect($psr->getAttribute('oauth_access_token_id'));
 
-        if (! $token
-            || ! $token->isActive()
-            || $token->expiresAt()->diffInSeconds() >= 0
-            || $token->notBefore() !== null && $token->notBefore()->diffInSeconds() < 0
-            || $psr->getAttribute('oauth_user_id') !== $token->user()
+        if (! ($token
+            && $token->isActive()
+            && $token->expiresAt()->diffInSeconds() < 0
+            && ($token->notBefore() === null || $token->notBefore()->diffInSeconds() >= 0))
         ) {
+            return null;
+        }
+
+        if ($psr->getAttribute('oauth_client_id') === $psr->getAttribute('oauth_user_id'))
+        {
+            if (
+                $psr->getAttribute('oauth_client_id') !== $token->client()
+                || $psr->getAttribute('oauth_client_id') !== $token->user()
+            ) {
+                return null;
+            }
+
+            $client = new Client($token->client());
+
+            return $client->withAccessToken($token);
+        }
+
+        if ($psr->getAttribute('oauth_user_id') !== $token->user()) {
             return null;
         }
 
         $user = $this->userResolver->resolveUserByToken($token, $this->provider);
 
-        /** @noinspection PhpUndefinedMethodInspection */
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
         return $user?->withAccessToken($token);
     }
 
@@ -106,12 +123,7 @@ class TokenGuard implements Guard
         // First, we will convert the Symfony request to a PSR-7 implementation which will
         // be compatible with the base OAuth2 library. The Symfony bridge can perform a
         // conversion for us to a new Nyholm implementation of this PSR-7 request.
-        $psr = (new PsrHttpFactory(
-            new Psr17Factory,
-            new Psr17Factory,
-            new Psr17Factory,
-            new Psr17Factory
-        ))->createRequest($request);
+        $psr = (new PsrHttpFactory())->createRequest($this->request);
 
         try {
             return $this->server->validateAuthenticatedRequest($psr);
@@ -123,12 +135,5 @@ class TokenGuard implements Guard
         }
 
         return null;
-    }
-
-    public function setRequest(Request $request): static
-    {
-        $this->request = $request;
-
-        return $this;
     }
 }

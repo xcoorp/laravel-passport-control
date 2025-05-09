@@ -12,14 +12,14 @@ class CheckScopes
     {
         $authGuard = Auth::guard($guard);
 
-        $user = $authGuard->user();
+        $authenticatable = $authGuard->user();
 
-        if (! $user) {
+        if (! $authenticatable) {
             throw UnauthorizedException::notLoggedIn();
         }
 
-        /** @noinspection PhpUndefinedMethodInspection */
-        if (! $user->tokenCan($scope)) {
+        /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+        if (! $authenticatable->tokenCan($scope)) {
             throw UnauthorizedException::forScopes($scope);
         }
 

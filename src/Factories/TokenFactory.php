@@ -5,7 +5,6 @@ namespace XCoorp\PassportControl\Factories;
 use Illuminate\Support\Carbon;
 use XCoorp\PassportControl\Contracts\TokenFactory as TokenFactoryContract;
 use XCoorp\PassportControl\Contracts\Token as TokenContract;
-use XCoorp\PassportControl\Enums\CredentialType;
 use XCoorp\PassportControl\Token;
 
 class TokenFactory implements TokenFactoryContract
@@ -20,7 +19,6 @@ class TokenFactory implements TokenFactoryContract
             isset($introspectionResult['scope']) ? explode(' ', $introspectionResult['scope']) : [],
                 $introspectionResult['client_id'],
                 $introspectionResult['sub'],
-            CredentialType::from(in_array($json['credential_type'] ?? 'unknown', array_column(CredentialType::cases(), 'value')) ? $introspectionResult['credential_type'] : 'unknown'),
             Carbon::createFromTimestamp($introspectionResult['exp']),
                 $introspectionResult['username'] ?? null,
             isset($introspectionResult['iat']) ? Carbon::createFromTimestamp($introspectionResult['iat']) : null,

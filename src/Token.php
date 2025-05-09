@@ -4,7 +4,6 @@ namespace XCoorp\PassportControl;
 
 use Illuminate\Support\Carbon;
 use XCoorp\PassportControl\Contracts\Token as TokenContract;
-use XCoorp\PassportControl\Enums\CredentialType;
 use XCoorp\PassportControl\Traits\ResolvesInheritedScopes;
 
 class Token implements TokenContract
@@ -16,7 +15,6 @@ class Token implements TokenContract
         protected array $scopes,
         protected string $clientId,
         protected string $userId,
-        protected CredentialType $credentialType,
         protected Carbon $expiresAt,
         protected ?string $username = null,
         protected ?Carbon $issuedAt = null,
@@ -59,11 +57,6 @@ class Token implements TokenContract
     public function user(): string
     {
         return $this->userId;
-    }
-
-    public function credentialType(): CredentialType
-    {
-        return $this->credentialType;
     }
 
     public function scopes(): array
