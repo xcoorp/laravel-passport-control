@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0-alpha.2](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2025-05-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* **auth:** add client credentials support
+
+### ✨ Features
+
+* **auth:** add client credentials support ([b69c28a](https://github.com/xcoorp/laravel-passport-control/commit/b69c28aea66b5bbd3cd45892dc0f0a1a75637a00))
+
 ## [2.0.0-alpha.1](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha...v2.0.0-alpha.1) (2025-02-25)
 
 
