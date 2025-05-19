@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.0-alpha.3](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.2...v2.0.0-alpha.3) (2025-05-19)
+
+
+### 🐛 Bugfixes
+
+* **ci:** allow manual workflow dispatch ([e7b9993](https://github.com/xcoorp/laravel-passport-control/commit/e7b9993cb149fd78a0445aba5ce67b5cf992fcdd))
+
 ## [2.0.0-alpha.2](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.1...v2.0.0-alpha.2) (2025-05-09)
 
 
