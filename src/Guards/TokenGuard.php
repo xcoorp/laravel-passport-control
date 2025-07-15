@@ -18,7 +18,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Throwable;
 use XCoorp\PassportControl\Auth\Client;
-use XCoorp\PassportControl\Contracts\Token;
 use XCoorp\PassportControl\Contracts\TokenRepository;
 use XCoorp\PassportControl\Contracts\UserResolver;
 use XCoorp\PassportControl\Exceptions\UnauthorizedException;
@@ -135,5 +134,18 @@ class TokenGuard implements Guard
         }
 
         return null;
+    }
+
+    /**
+     * Set the request instance, for example for Laravel Octane.
+     *
+     * @param  Request  $request
+     * @return static
+     */
+    public function setRequest(Request $request): static
+    {
+        $this->request = $request;
+
+        return $this;
     }
 }
