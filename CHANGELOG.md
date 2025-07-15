@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.0-alpha.4](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.3...v2.0.0-alpha.4) (2025-07-15)
+
+
+### 🐛 Bugfixes
+
+* **guard:** add setRequest method ([5fe7d68](https://github.com/xcoorp/laravel-passport-control/commit/5fe7d68fef359f6dcf9a1cbaafc1161e9e7c20dc))
+
 ## [2.0.0-alpha.3](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.2...v2.0.0-alpha.3) (2025-05-19)
 
 
