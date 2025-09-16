@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -13,8 +15,8 @@ use Lcobucci\JWT\Token\Parser;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\ResourceServer;
 use XCoorp\PassportControl\Bridge\AccessTokenRepository;
-use XCoorp\PassportControl\Contracts\TokenFactory as TokenFactoryContract;
 use XCoorp\PassportControl\Contracts\Token as TokenContract;
+use XCoorp\PassportControl\Contracts\TokenFactory as TokenFactoryContract;
 use XCoorp\PassportControl\Contracts\TokenRepository as TokenRepositoryContract;
 use XCoorp\PassportControl\Contracts\UserResolver as UserResolverContract;
 use XCoorp\PassportControl\Factories\TokenFactory;
@@ -29,7 +31,7 @@ class PassportControlServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/passport_control.php', 'passport_control'
+            __DIR__ . '/../config/passport_control.php', 'passport_control'
         );
 
         $this->app->bind(UserResolverContract::class, UserResolver::class);
@@ -56,7 +58,6 @@ class PassportControlServiceProvider extends ServiceProvider
         $this->registerGuard();
     }
 
-
     /**
      * @throws BindingResolutionException
      */
@@ -64,16 +65,18 @@ class PassportControlServiceProvider extends ServiceProvider
     {
         $this->registerPublishing();
     }
+
     /**
      * Create a CryptKey instance for the OAuth public key.
      */
     protected function makeCryptKey(): CryptKey
     {
-        return new CryptKey('file://'.PassportControl::keyPath('oauth-public.key'), null);
+        return new CryptKey('file://' . PassportControl::keyPath('oauth-public.key'), null);
     }
 
     /**
      * Register the token guard.
+     *
      * @throws BindingResolutionException
      */
     protected function registerGuard(): void
@@ -106,6 +109,7 @@ class PassportControlServiceProvider extends ServiceProvider
 
     /**
      * Register the package's publishable resources.
+     *
      * @throws BindingResolutionException
      */
     protected function registerPublishing(): void
@@ -115,27 +119,28 @@ class PassportControlServiceProvider extends ServiceProvider
         }
 
         $this->publishes([
-            __DIR__.'/../config/passport_control.php' => $this->app->configPath('passport_control.php'),
+            __DIR__ . '/../config/passport_control.php' => $this->app->configPath('passport_control.php'),
         ], ['passport_control', 'passport_control-config']);
 
         $this->publishes([
-            __DIR__.'/../database/migrations/change_id_column_users_table.php.stub' => $this->getMigrationFileName('change_id_column_users_table.php'),
+            __DIR__ . '/../database/migrations/change_id_column_users_table.php.stub' => $this->getMigrationFileName('change_id_column_users_table.php'),
         ], ['passport_control', 'passport_control-migrations']);
     }
 
     /**
      * Get the migration file name with timestamp.
+     *
      * @throws BindingResolutionException
      */
     protected function getMigrationFileName(string $migrationFileName): string
     {
         $timestamp = date('Y_m_d_His');
         $filesystem = $this->app->make(Filesystem::class);
-        $migrationPath = $this->app->databasePath().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR;
+        $migrationPath = $this->app->databasePath() . DIRECTORY_SEPARATOR . 'migrations' . DIRECTORY_SEPARATOR;
 
         return Collection::make([$migrationPath])
-            ->flatMap(fn ($path) => $filesystem->glob($path.'*_'.$migrationFileName))
-            ->push($migrationPath."{$timestamp}_$migrationFileName")
+            ->flatMap(fn ($path) => $filesystem->glob($path . '*_' . $migrationFileName))
+            ->push($migrationPath . "{$timestamp}_$migrationFileName")
             ->first();
     }
 }

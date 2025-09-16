@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Http\Middleware;
 
 use Closure;
@@ -10,9 +12,7 @@ class CheckScopes
 {
     public function handle($request, Closure $next, $scope, $guard = null)
     {
-        $authGuard = Auth::guard($guard);
-
-        $authenticatable = $authGuard->user();
+        $authenticatable = Auth::guard($guard)->user();
 
         if (! $authenticatable) {
             throw UnauthorizedException::notLoggedIn();
@@ -33,6 +33,6 @@ class CheckScopes
     {
         $args = is_null($guard) ? $scope : "$scope,$guard";
 
-        return static::class.':'.$args;
+        return static::class . ':' . $args;
     }
 }

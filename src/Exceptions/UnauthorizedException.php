@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Exceptions;
 
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -10,10 +12,10 @@ class UnauthorizedException extends HttpException
 
     public static function forScopes(string $scope): self
     {
-        $message = 'Access Token does not have the right scopes. Necessary scope is: '.$scope;
+        $message = 'Access Token does not have the right scopes. Necessary scope is: ' . $scope;
 
         $exception = new static(403, $message, null, [
-            'WWW-Authenticate' => 'Bearer, scope="'.$scope.'", error="insufficient_scope"',
+            'WWW-Authenticate' => 'Bearer, scope="' . $scope . '", error="insufficient_scope"',
         ]);
         $exception->requiredScope = $scope;
 

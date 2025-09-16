@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Contracts;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 
 interface Token
 {
@@ -21,9 +23,9 @@ interface Token
 
     public function scopes(): array;
 
-    public function expiresAt(): Carbon;
+    public function expiresAt(): CarbonInterface;
 
-    public function issuedAt(): ?Carbon;
+    public function issuedAt(): ?CarbonInterface;
 
-    public function notBefore(): ?Carbon;
+    public function notBefore(): ?CarbonInterface;
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Bridge;
 
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
@@ -12,7 +14,7 @@ class AccessToken implements AccessTokenEntityInterface
 {
     use AccessTokenTrait, EntityTrait, TokenEntityTrait;
 
-    public function __construct(string|null $userIdentifier, array $scopes, ClientEntityInterface $client)
+    public function __construct(?string $userIdentifier, array $scopes, ClientEntityInterface $client)
     {
         if (! is_null($userIdentifier)) {
             $this->setUserIdentifier($userIdentifier);

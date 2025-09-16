@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Bridge;
 
 use Illuminate\Contracts\Events\Dispatcher;
@@ -13,13 +15,12 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     public function __construct(
         protected TokenRepository $tokenRepository,
         protected Dispatcher $events
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
      */
-    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, string|null $userIdentifier = null): AccessTokenEntityInterface
+    public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, ?string $userIdentifier = null): AccessTokenEntityInterface
     {
         return new AccessToken($userIdentifier, $scopes, $clientEntity);
     }

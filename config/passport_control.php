@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -71,6 +73,6 @@ return [
         | This is useful to reduce the number of requests to the introspection endpoint.
         | Set this value to null to disable caching.
         */
-        'cache_introspection_result' =>  env('PASSCONTROL_CACHE_INTROSPECTION_RESULT'),
+        'cache_introspection_result' => env('PASSCONTROL_CACHE_INTROSPECTION_RESULT'),
     ],
 ];

@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Repositories;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Throwable;
-use XCoorp\PassportControl\Contracts\TokenFactory;
 use XCoorp\PassportControl\Contracts\Token;
+use XCoorp\PassportControl\Contracts\TokenFactory;
 use XCoorp\PassportControl\Contracts\TokenRepository as TokenRepositoryContract;
 use XCoorp\PassportControl\PassportControl;
 
@@ -15,8 +17,7 @@ class TokenRepository implements TokenRepositoryContract
 {
     public function __construct(
         protected TokenFactory $tokenFactory
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritDoc}
@@ -25,7 +26,7 @@ class TokenRepository implements TokenRepositoryContract
     {
         if (PassportControl::cacheIntrospectionResult() !== null) {
             try {
-                $result = Cache::store(PassportControl::cacheStore())->get(PassportControl::cachePrefix().'tk_'.$token_id);
+                $result = Cache::store(PassportControl::cacheStore())->get(PassportControl::cachePrefix() . 'tk_' . $token_id);
                 if ($result) {
                     return $result;
                 }
@@ -62,7 +63,7 @@ class TokenRepository implements TokenRepositoryContract
             if (PassportControl::cacheIntrospectionResult() !== null && ($json['active'] ?? false)) {
                 try {
                     Cache::store(PassportControl::cacheStore())->put(
-                        PassportControl::cachePrefix().'tk_'.$token_id,
+                        PassportControl::cachePrefix() . 'tk_' . $token_id,
                         $token,
                         min($json['exp'] - time(), PassportControl::cacheIntrospectionResult())
                     );
@@ -77,7 +78,6 @@ class TokenRepository implements TokenRepositoryContract
         return null;
     }
 
-
     /**
      * The introspection API is not a publicly accessible endpoint.
      * In order to access it, we need to authenticate with the introspection API.
@@ -87,7 +87,7 @@ class TokenRepository implements TokenRepositoryContract
     {
         // We have this in a separate try-catch block, because we do not want to stop working if the cache fails.
         try {
-            $accessToken = Cache::store(PassportControl::cacheStore())->get(PassportControl::cachePrefix().'introspection_at');
+            $accessToken = Cache::store(PassportControl::cacheStore())->get(PassportControl::cachePrefix() . 'introspection_at');
             if ($accessToken) {
                 return Crypt::decryptString($accessToken);
             }
@@ -122,7 +122,7 @@ class TokenRepository implements TokenRepositoryContract
         // We have this in a separate try-catch block, because we do not want to stop working if the cache fails.
         try {
             Cache::store(PassportControl::cacheStore())->put(
-                PassportControl::cachePrefix().'introspection_at',
+                PassportControl::cachePrefix() . 'introspection_at',
                 Crypt::encryptString($json['access_token']),
                 $json['expires_in'] - 60
             );

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Models\Traits;
 
 use XCoorp\PassportControl\Contracts\Token;

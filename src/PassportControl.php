@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl;
 
 class PassportControl
@@ -48,7 +50,6 @@ class PassportControl
      * How long to cache introspection results in seconds, null means never
      */
     public static ?int $cacheIntrospectionResults = null;
-
 
     public static function withCachePrefix(string $prefix): void
     {
@@ -120,8 +121,8 @@ class PassportControl
         $file = ltrim($file, '/\\');
 
         return static::$publicKeyPath
-            ? rtrim(static::$publicKeyPath, '/\\').DIRECTORY_SEPARATOR.$file
-            : config('passport_control.public_key_path').DIRECTORY_SEPARATOR.$file;
+            ? rtrim(static::$publicKeyPath, '/\\') . DIRECTORY_SEPARATOR . $file
+            : config('passport_control.public_key_path') . DIRECTORY_SEPARATOR . $file;
     }
 
     public static function useIntrospectEndpoint(string $endpoint): void

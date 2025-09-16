@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Guards;
 
 use Illuminate\Auth\GuardHelpers;
@@ -41,8 +43,7 @@ class TokenGuard implements Guard
         protected TokenRepository $tokens,
         protected Encrypter $encrypter,
         protected Request $request
-    ) {
-    }
+    ) {}
 
     /**
      * @throws Throwable
@@ -74,7 +75,8 @@ class TokenGuard implements Guard
     /**
      * @throws Throwable
      */
-    protected function authenticateViaBearerToken(Request $request): ?Authenticatable {
+    protected function authenticateViaBearerToken(Request $request): ?Authenticatable
+    {
         if (! $psr = $this->getPsrRequestViaBearerToken($request)) {
             return null;
         }
@@ -89,8 +91,7 @@ class TokenGuard implements Guard
             return null;
         }
 
-        if ($psr->getAttribute('oauth_client_id') === $psr->getAttribute('oauth_user_id'))
-        {
+        if ($psr->getAttribute('oauth_client_id') === $psr->getAttribute('oauth_user_id')) {
             if (
                 $psr->getAttribute('oauth_client_id') !== $token->client()
                 || $psr->getAttribute('oauth_client_id') !== $token->user()
@@ -98,19 +99,15 @@ class TokenGuard implements Guard
                 return null;
             }
 
-            $client = new Client($token->client());
-
-            return $client->withAccessToken($token);
+            return (new Client($token->client()))->withAccessToken($token);
         }
 
         if ($psr->getAttribute('oauth_user_id') !== $token->user()) {
             return null;
         }
 
-        $user = $this->userResolver->resolveUserByToken($token, $this->provider);
-
         /** @noinspection PhpPossiblePolymorphicInvocationInspection */
-        return $user?->withAccessToken($token);
+        return $this->userResolver->resolveUserByToken($token, $this->provider)?->withAccessToken($token);
     }
 
     /**
@@ -122,7 +119,7 @@ class TokenGuard implements Guard
         // First, we will convert the Symfony request to a PSR-7 implementation which will
         // be compatible with the base OAuth2 library. The Symfony bridge can perform a
         // conversion for us to a new Nyholm implementation of this PSR-7 request.
-        $psr = (new PsrHttpFactory())->createRequest($this->request);
+        $psr = (new PsrHttpFactory)->createRequest($this->request);
 
         try {
             return $this->server->validateAuthenticatedRequest($psr);
@@ -130,7 +127,7 @@ class TokenGuard implements Guard
             $request->headers->set('Authorization', '');
 
             Container::getInstance()->make(ExceptionHandler::class)
-                ->report(UnauthorizedException::notLoggedIn());
+                ?->report(UnauthorizedException::notLoggedIn());
         }
 
         return null;
@@ -138,9 +135,6 @@ class TokenGuard implements Guard
 
     /**
      * Set the request instance, for example for Laravel Octane.
-     *
-     * @param  Request  $request
-     * @return static
      */
     public function setRequest(Request $request): static
     {

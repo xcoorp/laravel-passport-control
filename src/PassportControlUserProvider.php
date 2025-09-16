@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl;
 
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -10,8 +12,7 @@ class PassportControlUserProvider implements UserProvider
     public function __construct(
         protected UserProvider $provider,
         protected string $providerName
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}

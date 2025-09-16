@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Resolver;
 
 use Illuminate\Contracts\Auth\Authenticatable;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -11,8 +13,7 @@ class Client implements Authenticatable
 
     public function __construct(
         public string $id
-    ) {
-    }
+    ) {}
 
     public function getAuthIdentifierName(): string
     {
@@ -38,9 +39,7 @@ class Client implements Authenticatable
         return null;
     }
 
-    public function setRememberToken($value): void
-    {
-    }
+    public function setRememberToken($value): void {}
 
     public function getRememberTokenName(): string
     {

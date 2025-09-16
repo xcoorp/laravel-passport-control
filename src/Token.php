@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace XCoorp\PassportControl;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
 use XCoorp\PassportControl\Contracts\Token as TokenContract;
 use XCoorp\PassportControl\Traits\ResolvesInheritedScopes;
 
@@ -15,19 +17,18 @@ class Token implements TokenContract
         protected array $scopes,
         protected string $clientId,
         protected string $userId,
-        protected Carbon $expiresAt,
+        protected CarbonInterface $expiresAt,
         protected ?string $username = null,
-        protected ?Carbon $issuedAt = null,
-        protected ?Carbon $notBefore = null,
-    ) {
-    }
+        protected ?CarbonInterface $issuedAt = null,
+        protected ?CarbonInterface $notBefore = null,
+    ) {}
 
     /**
      * {@inheritDoc}
      */
     public function can(string $scope): bool
     {
-        if (in_array('*', $this->scopes)) {
+        if (in_array('*', $this->scopes, true)) {
             return true;
         }
 
@@ -35,8 +36,8 @@ class Token implements TokenContract
             ? $this->resolveInheritedScopes($scope)
             : [$scope];
 
-        foreach ($scopes as $scope) {
-            if (in_array($scope, $this->scopes, true)) {
+        foreach ($scopes as $sc) {
+            if (in_array($sc, $this->scopes, true)) {
                 return true;
             }
         }
@@ -64,7 +65,7 @@ class Token implements TokenContract
         return $this->scopes;
     }
 
-    public function expiresAt(): Carbon
+    public function expiresAt(): CarbonInterface
     {
         return $this->expiresAt;
     }
@@ -74,12 +75,12 @@ class Token implements TokenContract
         return $this->username;
     }
 
-    public function issuedAt(): ?Carbon
+    public function issuedAt(): ?CarbonInterface
     {
         return $this->issuedAt;
     }
 
-    public function notBefore(): ?Carbon
+    public function notBefore(): ?CarbonInterface
     {
         return $this->notBefore;
     }
