@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0-alpha.5](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.4...v2.0.0-alpha.5) (2025-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **client:** add auth server client
+
+### ✨ Features
+
+* **client:** add auth server client ([c47c4e3](https://github.com/xcoorp/laravel-passport-control/commit/c47c4e36625c1a1ea4f88bcdbe617cf5c465f351))
+
+
+### 👽 Miscellaneous
+
+* **pint:** add strict types, code smell fixes ([71988b5](https://github.com/xcoorp/laravel-passport-control/commit/71988b5c6eb204a3c084a8afbfb223c294a54ca1))
+
 ## [2.0.0-alpha.4](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.3...v2.0.0-alpha.4) (2025-07-15)
 
 
