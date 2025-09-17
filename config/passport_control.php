@@ -20,13 +20,17 @@ return [
     | Token Configuration
     |--------------------------------------------------------------------------
     |
-    | These values are the access_token_endpoint, access_token_client_id and access_token_client_secret we need. You can get those values
+    | These values are the access_token_endpoint, access_token_client_id, access_token_client_secret and access_token_scopes we need. You can get those values
     | from your Laravel Passport server by creating a new CLIENT CREDENTIAL GRANT client.
     | We need this since access to the introspection endpoint is not public and only allowed for client credentials grant clients.
+    | Per default this package requests the introspect scope, since this is the scope required to access the introspection endpoint.
+    | You may change these values to the values of your Laravel Passport server. You can also add scopes here if you for example use
+    | the AuthenticationServerService in your app for making other requests to the Auth server (which may need different scopes).
      */
     'access_token_endpoint' => env('PASSCONTROL_ACCESS_TOKEN_ENDPOINT', 'http://localhost/oauth/token'),
     'access_token_client_id' => env('PASSCONTROL_ACCESS_TOKEN_CLIENT_ID', ''),
     'access_token_client_secret' => env('PASSCONTROL_ACCESS_TOKEN_CLIENT_SECRET', ''),
+    'access_token_scopes' => env('PASSCONTROL_ACCESS_TOKEN_SCOPES', 'introspect'),
 
     /*
      |--------------------------------------------------------------------------

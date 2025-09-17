@@ -15,6 +15,8 @@ use Lcobucci\JWT\Token\Parser;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\ResourceServer;
 use XCoorp\PassportControl\Bridge\AccessTokenRepository;
+use XCoorp\PassportControl\Clients\AuthServerClient;
+use XCoorp\PassportControl\Contracts\Client as ClientContact;
 use XCoorp\PassportControl\Contracts\Token as TokenContract;
 use XCoorp\PassportControl\Contracts\TokenFactory as TokenFactoryContract;
 use XCoorp\PassportControl\Contracts\TokenRepository as TokenRepositoryContract;
@@ -38,9 +40,11 @@ class PassportControlServiceProvider extends ServiceProvider
 
         $this->app->bind(TokenContract::class, Token::class);
         $this->app->bind(TokenFactoryContract::class, TokenFactory::class);
+        $this->app->bind(ClientContact::class, AuthServerClient::class);
         $this->app->bind(TokenRepositoryContract::class, function ($app) {
             return new Repositories\TokenRepository(
-                $app->make(TokenFactoryContract::class)
+                $app->make(TokenFactoryContract::class),
+                $app->make(ClientContact::class)
             );
         });
 

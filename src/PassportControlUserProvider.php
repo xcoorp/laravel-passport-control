@@ -61,9 +61,4 @@ class PassportControlUserProvider implements UserProvider
     {
         $this->provider->rehashPasswordIfRequired($user, $credentials, $force);
     }
-
-    public function getProviderName(): string
-    {
-        return $this->providerName;
-    }
 }

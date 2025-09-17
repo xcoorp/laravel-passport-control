@@ -90,6 +90,7 @@ The following Environment variables are available:
 | PASSCONTROL_ACCESS_TOKEN_ENDPOINT      | The Token Endpoint URL to receive a new access token. Usually $YOUR_PASSPORT_SERVER/oauth/token                                                    | http://localhost/oauth/token      |
 | PASSCONTROL_ACCESS_TOKEN_CLIENT_ID     | Client Id needed to get the access token for introspection. Check [Pre-requisites](#pre-requisites) for more information.                          |                                   |
 | PASSCONTROL_ACCESS_TOKEN_CLIENT_SECRET | Client Secret needed to get the access token for introspection. Check [Pre-requisites](#pre-requisites) for more information.                      |                                   |
+| PASSCONTROL_ACCESS_TOKEN_SCOPES        | Scopes to request from the authentication server when requesting the access token above (comma separated)                                          | introspect                        |
 | PASSCONTROL_PUBLIC_KEY_PATH            | Path where the public key file `oauth-public.key` is stored. NOTE: Specify the path without the filename.                                          | Laravel Storage Path (storage)    |
 | PASSCONTROL_INHERIT_SCOPES             | In Laravel Passport, you can configure that the scopes are inherited from the parent client, set to true if you have passport configured that way. | False                             |
 | PASSCONTROL_CACHE_STORE                | Cache Storage used for storing the Client Credential Access Token                                                                                  | `CACHE_STORE`, file               |
@@ -118,10 +119,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 ```
 
-You should also check out the other 2 middlewares provided by this package:
+You should also check out the middlewares provided by this package:
 
 - `CheckScopes` - Check if the authenticated user's token has the given scopes.
-- `CheckCredentialType` - Check the credential type of the authenticated user's token. (e.g "pkce", "client_credentials", "password")
 
 ### Advanced Usage
 
@@ -129,6 +129,19 @@ This package makes use of Laravel's Dependency Injection, so you can easily over
 custom user resolvers (for creating users when they do not exist in your db yet) or custom Token class if you need to extend the default functionality.
 
 Checkout the `PassportControlServiceProvider` class for more information.
+
+It is possible to send a custom request to the Authentication Server's API if you need to inside your app.
+You can archive this by using the `XCoorp\PassportControl\Clients\AuthServerClient` class.
+
+e.g
+
+```php
+// Get all users from the Authentication Server API Endpoint
+$client = new \XCoorp\PassportControl\Clients\AuthServerClient();
+
+// request() will return a PendingRequest instance, with the access token and baseURL already set
+$response = $client->request()->get('/api/users');
+```
 
 ## Testing
 

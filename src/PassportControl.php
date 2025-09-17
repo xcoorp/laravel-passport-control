@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace XCoorp\PassportControl;
 
+use Illuminate\Support\Facades\Config;
+
 class PassportControl
 {
     /**
@@ -37,6 +39,11 @@ class PassportControl
     public static ?string $clientSecret = null;
 
     /**
+     * The scopes to request when creating an access token (via token endpoint) for the introspection endpoint.
+     */
+    public static ?array $scopes = null;
+
+    /**
      * The cache store to use for caching access tokens and other cacheable data.
      */
     public static ?string $cacheStore = null;
@@ -58,7 +65,7 @@ class PassportControl
 
     public static function cachePrefix(): string
     {
-        return static::$cachePrefix ?? config('passport_control.cache.prefix');
+        return static::$cachePrefix ?? Config::get('passport_control.cache.prefix');
     }
 
     public static function withCacheStore(string $store): void
@@ -68,7 +75,7 @@ class PassportControl
 
     public static function cacheStore(): string
     {
-        return static::$cacheStore ?? config('passport_control.cache.store');
+        return static::$cacheStore ?? Config::get('passport_control.cache.store');
     }
 
     public static function withCacheIntrospectionResult(?int $timeInSeconds): void
@@ -78,7 +85,7 @@ class PassportControl
 
     public static function cacheIntrospectionResult(): ?int
     {
-        return static::$cacheIntrospectionResults ?? config('passport_control.cache.cache_introspection_result');
+        return static::$cacheIntrospectionResults ?? Config::get('passport_control.cache.cache_introspection_result');
     }
 
     public static function withAccessTokenEndpoint(string $endpoint): void
@@ -88,7 +95,7 @@ class PassportControl
 
     public static function accessTokenEndpoint(): string
     {
-        return static::$accessTokenEndpoint ?? config('passport_control.access_token_endpoint');
+        return static::$accessTokenEndpoint ?? Config::get('passport_control.access_token_endpoint');
     }
 
     public static function withClientID(string $clientId): void
@@ -98,7 +105,7 @@ class PassportControl
 
     public static function clientID(): string
     {
-        return static::$clientId ?? config('passport_control.access_token_client_id');
+        return static::$clientId ?? Config::get('passport_control.access_token_client_id');
     }
 
     public static function withClientSecret(string $clientSecret): void
@@ -108,7 +115,17 @@ class PassportControl
 
     public static function clientSecret(): string
     {
-        return static::$clientSecret ?? config('passport_control.access_token_client_secret');
+        return static::$clientSecret ?? Config::get('passport_control.access_token_client_secret');
+    }
+
+    public static function withScopes(string $scopes): void
+    {
+        static::$scopes = explode(',', $scopes);
+    }
+
+    public static function scopes(): array
+    {
+        return static::$scopes ?? explode(',', Config::get('passport_control.access_token_scopes'));
     }
 
     public static function loadKeyFrom(string $path): void
@@ -122,7 +139,7 @@ class PassportControl
 
         return static::$publicKeyPath
             ? rtrim(static::$publicKeyPath, '/\\') . DIRECTORY_SEPARATOR . $file
-            : config('passport_control.public_key_path') . DIRECTORY_SEPARATOR . $file;
+            : Config::get('passport_control.public_key_path') . DIRECTORY_SEPARATOR . $file;
     }
 
     public static function useIntrospectEndpoint(string $endpoint): void
@@ -132,7 +149,7 @@ class PassportControl
 
     public static function introspectEndpoint(): string
     {
-        return static::$introspectEndpoint ?? config('passport_control.introspection_endpoint');
+        return static::$introspectEndpoint ?? Config::get('passport_control.introspection_endpoint');
     }
 
     public static function inheritScopes(bool $withInheritedScopes = true): void
@@ -142,6 +159,6 @@ class PassportControl
 
     public static function withInheritedScopes(): bool
     {
-        return static::$withInheritedScopes ?? config('passport_control.inherit_scopes');
+        return static::$withInheritedScopes ?? Config::get('passport_control.inherit_scopes');
     }
 }
