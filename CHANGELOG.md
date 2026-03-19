@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1-alpha.5](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.5...v2.0.1-alpha.5) (2026-03-19)
+
+
+### 👽 Miscellaneous
+
+* **deps:** add laravel 13 support ([f0f7cae](https://github.com/xcoorp/laravel-passport-control/commit/f0f7cae2758c68eb08f56c6c8885d0e23b39fb08))
+
 ## [2.0.0-alpha.5](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.4...v2.0.0-alpha.5) (2025-09-17)
 
 
