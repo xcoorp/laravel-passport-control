@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0-alpha.6](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.5...v2.0.0-alpha.6) (2026-05-11)
+
+
+### 🐛 Bugfixes
+
+* **guard:** fix container scoping ([4cd87a0](https://github.com/xcoorp/laravel-passport-control/commit/4cd87a0938d1c802d09fdb3fe4594c73a1b9b1b1))
+
+
+### 👽 Miscellaneous
+
+* **deps:** add laravel 13 support ([f0f7cae](https://github.com/xcoorp/laravel-passport-control/commit/f0f7cae2758c68eb08f56c6c8885d0e23b39fb08))
+
 ## [2.0.0-alpha.5](https://github.com/xcoorp/laravel-passport-control/compare/v2.0.0-alpha.4...v2.0.0-alpha.5) (2025-09-17)
 
 
