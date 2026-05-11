@@ -87,28 +87,20 @@ class PassportControlServiceProvider extends ServiceProvider
     {
         Auth::resolved(function ($auth) {
             $auth->extend('passport_control', function ($app, $name, array $config) {
-                return tap($this->makeGuard($config), function ($guard) {
+                return tap(new TokenGuard(
+                    $this->app->make(ResourceServer::class),
+                    new PassportControlUserProvider(Auth::createUserProvider($config['provider']), $config['provider']),
+                    $this->app->make(UserResolverContract::class),
+                    $this->app->make(TokenRepositoryContract::class),
+                    $this->app->make('encrypter'),
+                    $this->app->make('request')
+                ), function ($guard) {
                     $app = $this->app;
                     /** @noinspection PhpUndefinedMethodInspection */
                     $app->refresh('request', $guard, 'setRequest');
                 });
             });
         });
-    }
-
-    /**
-     * @throws BindingResolutionException
-     */
-    protected function makeGuard(array $config): TokenGuard
-    {
-        return new TokenGuard(
-            $this->app->make(ResourceServer::class),
-            new PassportControlUserProvider(Auth::createUserProvider($config['provider']), $config['provider']),
-            $this->app->make(UserResolverContract::class),
-            $this->app->make(TokenRepositoryContract::class),
-            $this->app->make('encrypter'),
-            $this->app->make('request')
-        );
     }
 
     /**
